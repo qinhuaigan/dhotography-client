@@ -17,9 +17,8 @@ globalData.applicationURL = localStorage.getItem('applicationURL')
 const axios = require('axios')
 const Message = ElementUI.Message
 
-axios.defaults.baseURL = 'http://192.168.2.140' // 本地环境
-Vue.prototype.baseURL = 'http://192.168.2.140' // 本地环境
-Vue.prototype.fileBaseURL = 'http://192.168.2.140/data/access/' // 本地环境
+axios.defaults.baseURL = '//localhost:3000/api' // 本地环境
+Vue.prototype.baseURL = '//localhost:3000/api' // 本地环境
 
 // axios.defaults.baseURL = '' // 测试和正式环境
 // Vue.prototype.baseURL = '' // 测试
@@ -191,16 +190,6 @@ localStorage.removeItem('authorityList')
 // 获取登录用户所拥有的权限
 Vue.prototype.getGlobalUserPermission = function () {
   return new Promise((resolve) => {
-    // const userPermission = localStorage.getItem('authorityList')
-    // if (userPermission) {
-    //   Vue.prototype.globalData.userPermission = userPermission.split(',')
-    //   Vue.prototype.globalData.userPermission = Vue.prototype.globalData.userPermission.reduce((total, item) => {
-    //     total.push(parseFloat(item))
-    //     return total
-    //   }, [])
-    //   resolve(Vue.prototype.globalData.userPermission)
-    //   return
-    // }
     const token = localStorage.getItem('token')
     if (!token) {
       resolve([])
@@ -305,14 +294,7 @@ Vue.prototype.getSMSCode = function (phone, type) {
   })
 }
 
-Promise.all([Vue.prototype.getGlobalUserPermission(), Vue.prototype.getUserInfo()]).then((result) => {
-  // 保存 "用户权限"
-  Vue.prototype.globalData.userPermission = result[0] || []
-  // 如果是 "游客"，授予默认权限 "企业信息查看/企业认证"
-  if (store.state.userInfo && store.state.userInfo.identity === '游客') {
-    Vue.prototype.globalData.userPermission.push(13, 14)
-  }
-  localStorage.setItem('authorityList', Vue.prototype.globalData.userPermission)
+Promise.all([]).then((result) => {
   /* eslint-disable no-new */
   new Vue({
     el: '#app',
@@ -324,3 +306,23 @@ Promise.all([Vue.prototype.getGlobalUserPermission(), Vue.prototype.getUserInfo(
     template: '<App/>'
   })
 })
+
+// Promise.all([Vue.prototype.getGlobalUserPermission(), Vue.prototype.getUserInfo()]).then((result) => {
+//   // 保存 "用户权限"
+//   Vue.prototype.globalData.userPermission = result[0] || []
+//   // 如果是 "游客"，授予默认权限 "企业信息查看/企业认证"
+//   if (store.state.userInfo && store.state.userInfo.identity === '游客') {
+//     Vue.prototype.globalData.userPermission.push(13, 14)
+//   }
+//   localStorage.setItem('authorityList', Vue.prototype.globalData.userPermission)
+//   /* eslint-disable no-new */
+//   new Vue({
+//     el: '#app',
+//     router,
+//     store,
+//     components: {
+//       App
+//     },
+//     template: '<App/>'
+//   })
+// })
