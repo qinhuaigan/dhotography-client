@@ -17,8 +17,8 @@ globalData.applicationURL = localStorage.getItem('applicationURL')
 const axios = require('axios')
 const Message = ElementUI.Message
 
-axios.defaults.baseURL = '//localhost:3000/api' // 本地环境
-Vue.prototype.baseURL = '//localhost:3000/api' // 本地环境
+axios.defaults.baseURL = 'http://localhost:3000/api' // 本地环境
+Vue.prototype.baseURL = 'http://localhost:3000/api' // 本地环境
 
 // axios.defaults.baseURL = '' // 测试和正式环境
 // Vue.prototype.baseURL = '' // 测试
@@ -220,13 +220,14 @@ Vue.prototype.getGlobalUserPermission = function () {
 
 Vue.prototype.getUserInfo = function () { // 获取登录用户的信息
   return new Promise((resolve) => {
-    if (!Vue.prototype.globalData.token) {
-      resolve(false)
-      return
-    }
+    const token = localStorage.getItem('token') ? localStorage.getItem('token') : this ? this.globalData.token : null
+    // const autoLogin = JSON.parse(localStorage.getItem('autoLogin'))
+    // if (!token || !autoLogin) {
+    //   return
+    // }
     axios({
-      method: 'get',
-      url: `/account/account/getUserByToken?token=${Vue.prototype.globalData.token}`
+      method: 'post',
+      url: `/UserInformations/getUserInfoByToken?access_token=${token}`
     }).then((response) => {
       if (response.data.code === 0) {
         store.commit('increment', {
@@ -236,6 +237,8 @@ Vue.prototype.getUserInfo = function () { // 获取登录用户的信息
         Vue.prototype.globalData.isLogin = true
         resolve(response.data.data)
       } else {
+        // token 已过期, 跳到登录页面
+        localStorage.setItem('loginOverdue', true)
         Message({
           type: 'error',
           message: response.data.msg
@@ -245,6 +248,8 @@ Vue.prototype.getUserInfo = function () { // 获取登录用户的信息
         resolve(false)
       }
     }).catch(() => {
+      // token 已过期, 跳到登录页面
+      localStorage.setItem('loginOverdue', true)
       store.state.userInfo = null
       Vue.prototype.globalData.isLogin = false
       resolve(false)
@@ -294,7 +299,7 @@ Vue.prototype.getSMSCode = function (phone, type) {
   })
 }
 
-Promise.all([]).then((result) => {
+Promise.all([Vue.prototype.getUserInfo()]).then((result) => {
   /* eslint-disable no-new */
   new Vue({
     el: '#app',

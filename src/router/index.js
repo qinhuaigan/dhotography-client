@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import login from '../views/login'
+import home from '../views/home'
+import homeContent from '../views/homeContent'
+import carousel from '../views/carousel'
 import {
   Message
 } from 'element-ui'
@@ -11,21 +14,34 @@ Vue.use(Router)
 const router = new Route({
   routes: [{
     path: '/',
-    name: 'login',
-    component: login
+    redirect: '/home'
   }, {
     path: '/login',
     name: 'login',
     component: login
+  }, {
+    path: '/home',
+    name: 'home',
+    component: home,
+    redirect: '/carousel',
+    children: [{
+      path: '/carousel',
+      name: 'carousel',
+      component: carousel
+    }, {
+      path: '/homeContent',
+      name: 'homeContent',
+      component: homeContent
+    }]
   }]
 })
 
 router.beforeEach(async (to, from, next) => {
-  // 判断登录是否已过期,过期则跳转到登录页面
-  const loginOverdue = localStorage.getItem('loginOverdue')
+  const loginOverdue = JSON.parse(localStorage.getItem('loginOverdue'))
+  // const autoLogin = JSON.parse(localStorage.getItem('autoLogin'))
   if (loginOverdue) {
     localStorage.removeItem('loginOverdue')
-    next('/enterpriseLogin_M0')
+    next('/login')
     return
   }
   /* 检测是否拥有访问当前页面的权限 */

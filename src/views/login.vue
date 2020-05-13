@@ -1,5 +1,5 @@
 <template>
-  <div class="loginBg">
+  <div id="loginBg" class="loginBg">
     <div class="loginBox">
       <h3 class="login-title">星星摄影服务平台</h3>
       <div class="input">
@@ -13,7 +13,7 @@
       </div>
       <div class="mt20px clearfix">
         <div class="w50 fl text-left">
-          <el-checkbox v-model="autoLogin">自动登录</el-checkbox>
+          <el-checkbox v-model="autoLogin" @change="loginChange()">自动登录</el-checkbox>
         </div>
         <div class="w50 fl text-right" style="color: #ced1df;">
           <router-link to="">忘记密码？</router-link>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 export default {
   name: 'login',
   components: {
@@ -37,7 +38,7 @@ export default {
     }
   },
   methods: {
-    login () {
+    async login () {
       let msg
       if (!this.username) {
         msg = '请输入手机号或邮箱'
@@ -49,6 +50,7 @@ export default {
           type: 'warning',
           message: msg
         })
+        return
       }
       this.$axios({
         method: 'post',
@@ -59,9 +61,23 @@ export default {
         }
       }).then((response) => {
         if (response.data.code === 0) {
+          this.globalData.token = response.data.data
+          this.globalData.isLogin = true
+          this.getUserInfo().then((result) => {
+            this.$store.state.userInfo = result
+          })
           this.$message({
             type: 'success',
             message: '登录成功'
+          })
+          if (this.autoLogin) {
+            localStorage.setItem('token', response.data.data)
+            localStorage.setItem('autoLogin', this.autoLogin)
+            localStorage.setItem('username', this.username)
+            localStorage.setItem('password', this.password)
+          }
+          this.$router.push({
+            path: '/home'
           })
         } else {
           this.$message({
@@ -70,12 +86,42 @@ export default {
           })
         }
       }).catch((error) => {
-        this.$message({
-          type: 'error',
-          message: `${error.msg || '登录失败'}`
-        })
+        if (error.response) {
+          const err = error.response.data
+          this.$message({
+            type: 'error',
+            message: `${err.error.message || '登录失败'}`
+          })
+        }
       })
+    },
+    loginChange () {
+      if (!this.autoLogin) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('autoLogin')
+        localStorage.removeItem('username')
+        localStorage.removeItem('password')
+      } else {
+        localStorage.setItem('autoLogin', this.autoLogin)
+      }
     }
+  },
+  created () {
+    this.autoLogin = JSON.parse(localStorage.getItem('autoLogin'))
+    if (this.autoLogin) {
+      this.username = localStorage.getItem('username')
+      this.password = localStorage.getItem('password')
+    }
+  },
+  mounted () {
+    $(document).bind('keyup', (e) => {
+      if (e.keyCode === 13) {
+        this.login()
+      }
+    })
+  },
+  destroyed () {
+    $(document).unbind('keyup')
   }
 }
 </script>
@@ -164,7 +210,7 @@ export default {
   }
 
   .loginBox .el-checkbox__inner::after {
-    border-color: #ced1df;
+    border-color: #2b2c2d;
   }
 
   .login-btn {
