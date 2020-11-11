@@ -1,8 +1,11 @@
 <template>
   <div id="carousel">
+    <el-tabs v-model="carouselType" type="card" @tab-click="getTableData()">
+      <el-tab-pane :label="item.label" :name="item.value" v-for="item in tabs" :key="item.value"></el-tab-pane>
+    </el-tabs>
     <div class="clearfix">
       <div class="fl">
-        <el-button type="primary" @click="addNewCarousel()">添加轮播图</el-button>
+        <el-button type="primary" @click="addNewCarousel()">添加</el-button>
       </div>
     </div>
     <div class="clearfix mt20px">
@@ -42,8 +45,16 @@ export default {
   components: {
     tableList
   },
-  data () {
+  data: function () {
     return {
+      carouselType: '1',
+      tabs: [{
+        label: '轮播图',
+        value: '1'
+      }, {
+        label: '环境展示',
+        value: '2'
+      }],
       fileList: [],
       carouselInfo: null,
       dialogTitle: null,
@@ -75,10 +86,10 @@ export default {
     }
   },
   methods: {
-    handleClick (fun, index, data) {
+    handleClick: function (fun, index, data) {
       this[fun](index, data)
     },
-    remove (index, data) {
+    remove: function (index, data) {
       this.$confirm('您确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -107,19 +118,15 @@ export default {
         }).catch(() => {
           this.hideLoading()
         })
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
       })
     },
-    handleRemove () {
+    handleRemove: function () {
       this.carouselInfo.file = null
     },
-    selectFile (file, fileList) {
+    selectFile: function (file, fileList) {
       this.carouselInfo.file = file.raw
     },
-    edit (index, data) {
+    edit: function (index, data) {
       this.dialogTitle = '编辑轮播图'
       this.dialogVisible = true
       this.carouselInfo = JSON.parse(JSON.stringify(data))
@@ -128,7 +135,7 @@ export default {
         url: `${this.baseURL}${data.path}`
       }]
     },
-    addNewCarousel () {
+    addNewCarousel: function () {
       this.fileList = []
       this.carouselInfo = {
         title: null,
@@ -139,7 +146,7 @@ export default {
       this.dialogTitle = '添加轮播图'
       this.dialogVisible = true
     },
-    confirm () { // 添加/修改轮播图
+    confirm: function () { // 添加/修改轮播图
       const url = this.dialogTitle === '添加轮播图' ? '/Carousels/addCarousel' : '/Carousels/upfateCarousel'
       if (this.dialogTitle === '添加轮播图' && !this.carouselInfo.file) {
         this.$message({
@@ -149,10 +156,14 @@ export default {
         return
       }
       this.showLoading()
+      const data = Object.assign({
+        type: this.carouselType
+      }, this.carouselInfo)
       this.$axios({
         method: 'post',
         url: `${url}?access_token=${this.globalData.token}`,
-        data: this.formatFormData(this.carouselInfo)
+        data: this.formatFormData(data),
+        maxContentLength: Infinity
       }).then((response) => {
         if (response.data.code === 0) {
           this.$message({
@@ -190,11 +201,14 @@ export default {
         })
       })
     },
-    getTableData () {
+    getTableData: function () {
       this.showLoading()
       this.$axios({
         method: 'post',
-        url: `/Carousels/getCarousel?access_token=${this.globalData.token}`
+        url: `/Carousels/getCarousel?access_token=${this.globalData.token}`,
+        data: {
+          type: this.carouselType
+        }
       }).then((response) => {
         if (response.data.code === 0) {
           this.tableData = response.data.data
@@ -214,7 +228,7 @@ export default {
       })
     }
   },
-  created () {
+  created: function () {
     this.getTableData()
   }
 }

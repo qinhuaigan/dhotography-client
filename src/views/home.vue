@@ -32,32 +32,16 @@ export default {
     sideMenu,
     breadCrumbs
   },
-  data () {
+  data: function () {
     return {
       bars: [{
-        title: '首页',
+        title: '首页内容',
         icon: 'el-icon-s-data',
-        children: [{
-          title: '轮播图管理',
-          icon: 'el-icon-s-ticket',
-          path: '/carousel'
-        }, {
-          title: '服务内容管理',
-          icon: 'el-icon-tickets',
-          path: '/'
-        }, {
-          title: '作品管理',
-          icon: 'el-icon-notebook-1',
-          path: '/'
-        }, {
-          title: '主题管理',
-          icon: 'el-icon-s-marketing',
-          path: '/'
-        }, {
-          title: '环境展示管理',
-          icon: 'el-icon-school',
-          path: '/'
-        }]
+        path: '/carousel'
+      }, {
+        title: '服务单管理',
+        icon: 'el-icon-tickets',
+        path: '/theme'
       }, {
         title: '订单管理',
         icon: 'el-icon-s-order',
@@ -73,7 +57,7 @@ export default {
     }
   },
   methods: {
-    skinPeeler (color) {
+    skinPeeler: function (color) {
       if (color === '#6A6969') {
         this.bgColor = '#fff'
         this.textColor = '#000'
@@ -93,7 +77,7 @@ export default {
       }
     }
   },
-  created () {
+  created: function () {
 
   }
 }

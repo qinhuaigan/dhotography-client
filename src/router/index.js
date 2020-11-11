@@ -4,6 +4,8 @@ import login from '../views/login'
 import home from '../views/home'
 import homeContent from '../views/homeContent'
 import carousel from '../views/carousel'
+import carouselHome from '../views/carouselHome'
+import theme from '../views/theme'
 import {
   Message
 } from 'element-ui'
@@ -20,6 +22,10 @@ const router = new Route({
     name: 'login',
     component: login
   }, {
+    path: '/carouselHome',
+    name: 'carouselHome',
+    component: carouselHome
+  }, {
     path: '/home',
     name: 'home',
     component: home,
@@ -32,6 +38,10 @@ const router = new Route({
       path: '/homeContent',
       name: 'homeContent',
       component: homeContent
+    }, {
+      path: '/theme',
+      name: 'theme',
+      component: theme
     }]
   }]
 })
