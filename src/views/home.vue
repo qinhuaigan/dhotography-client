@@ -43,13 +43,13 @@ export default {
         icon: 'el-icon-tickets',
         path: '/theme'
       }, {
-        title: '订单管理',
+        title: '客户预约',
         icon: 'el-icon-s-order',
-        path: '/operator/operatorOrderManagement_G2'
+        path: '/order'
       }, {
         title: '用户管理',
         icon: 'el-icon-s-custom',
-        path: '/operator/operatorUserManagement_G7'
+        path: '/users'
       }],
       bgColor: '#fff',
       textColor: '#000',

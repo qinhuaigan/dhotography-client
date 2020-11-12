@@ -1,0 +1,237 @@
+<template>
+  <div id="order">
+    <div class="clearfix">
+      <div class="fl">
+        <search :searchDatas="searchDatas" @search="searchChange"></search>
+      </div>
+    </div>
+    <div class="clearfix mt20px">
+      <tableList :titles="titles" :showPagination="true" :currentPage="curentPage" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="200px"></tableList>
+    </div>
+  </div>
+</template>
+
+<script>
+import tableList from '../components/tableList.vue'
+import search from '../components/search.vue'
+export default {
+  name: 'order',
+  components: {
+    tableList,
+    search
+  },
+  data: function () {
+    return {
+      searchCode: [],
+      curentPage: 1,
+      pageSize: 10,
+      total: 0,
+      searchDatas: [{
+        type: 'input', // 'input' 输入框，'select' 下拉框，
+        placeholder: '请输入标题'
+      }, {
+        type: 'select', // 'input' 输入框，'select' 下拉框，
+        placeholder: '状态',
+        options: [{
+          label: '全部',
+          type: null
+        }, {
+          label: '已取消',
+          value: -1
+        }, {
+          label: '申请中',
+          value: 0
+        }, {
+          label: '已预约',
+          value: 1
+        }, {
+          label: '已完成',
+          value: 2
+        }]
+      }],
+      titles: [{
+        label: '订单号',
+        prop: 'path',
+        width: '150px'
+      }, {
+        label: '服务单号',
+        prop: 'title',
+        width: '150px'
+      }, {
+        label: '服务单标题',
+        prop: 'themeNo',
+        width: '150px'
+      }, {
+        label: '客户姓名',
+        prop: 'showPrice'
+      }, {
+        label: '手机号',
+        prop: 'phone'
+      }, {
+        label: '客户备注',
+        prop: 'phone'
+      }, {
+        label: '状态',
+        prop: 'statusName'
+      }, {
+        label: '预约时间',
+        prop: 'appointmentTime',
+        width: '110px'
+      }],
+      tableData: [{}],
+      btns: [{
+        text: '拒绝预约',
+        fun: 'refuse'
+      }, {
+        text: '接受预约',
+        type: 'primary',
+        fun: 'accept'
+      }, {
+        text: '标记完成',
+        type: 'primary',
+        fun: 'setComplete'
+      }]
+    }
+  },
+  methods: {
+    refuse (index, row) { // 拒绝预约
+      this.$prompt('拒绝本次预约，可输入备注', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(({ value }) => {
+        this.updateStatus(row.id, -1, value)
+      }).catch(() => {
+      })
+    },
+    accept (index, row) { // 接受预约
+      this.updateStatus(row.id, 1)
+    },
+    setComplete (index, row) { // 标记预约为 "已完成"
+      this.updateStatus(row.id, 2)
+    },
+    pageChange (currentPage, pageSize) {
+      this.curentPage = currentPage
+      this.pageSize = pageSize
+      this.getTableData()
+    },
+    searchChange (models) {
+      this.searchCode = models
+      this.curentPage = 1
+      this.getTableData()
+    },
+    handleClick (fun, index, data) {
+      this[fun](index, data)
+    },
+    remove (index, data) {
+      this.$confirm('您确定要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$axios({
+          method: 'post',
+          url: `/Carousels/removeCarousel?access_token=${this.globalData.token}`,
+          data: {
+            token: this.globalData.token,
+            id: data.id
+          }
+        }).then((response) => {
+          if (response.data.code === 0) {
+            this.tableData.splice(index, 1)
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+          } else {
+            this.$message({
+              type: 'error',
+              message: response.data.msg
+            })
+          }
+        }).catch(() => {
+          this.hideLoading()
+        })
+      })
+    },
+    updateStatus (id, status, remarks) { // 更新订单状态
+      this.showLoading()
+      this.$axios({
+        method: 'post',
+        url: `/Orders/updateOrder?access_token=${this.globalData.token}`,
+        data: {
+          id,
+          status,
+          businessRemarks: remarks
+        }
+      }).then((response) => {
+        if (response.data.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '更新成功'
+          })
+          this.getTableData()
+        } else {
+          this.$message({
+            type: 'error',
+            message: response.data.msg
+          })
+        }
+        this.hideLoading()
+      }).catch((error) => {
+        this.hideLoading()
+        this.$message({
+          type: 'error',
+          message: `${error.response.data.error.message || '添加失败'}`
+        })
+      })
+    },
+    getTableData () {
+      const data = {
+        query: this.searchCode[0],
+        status: this.searchCode[1],
+        currentPage: this.curentPage,
+        pageSize: this.pageSize
+      }
+      this.showLoading()
+      this.$axios({
+        method: 'post',
+        url: `/Orders/getOrders?access_token=${this.globalData.token}`,
+        data
+      }).then((response) => {
+        if (response.data.code === 0) {
+          this.tableData = response.data.result
+          this.total = response.data.count || 0
+          this.tableData.forEach((item) => {
+            item.appointmentTime = this.formatDate(item.appointmentTime, 'yyyy-MM-dd HH:mm')
+            if (item.status === -1 || item.status === 2) {
+              item.hiddenBtns = ['拒绝预约', '接受预约', '标记完成']
+            } else if (item.status === 0) {
+              item.hiddenBtns = ['标记完成']
+            } else if (item.status === 1) {
+              item.hiddenBtns = ['拒绝预约', '接受预约']
+            }
+          })
+        } else {
+          this.$message({
+            type: 'error',
+            message: response.data.msg
+          })
+        }
+        this.hideLoading()
+      }).catch((error) => {
+        this.hideLoading()
+        this.$message({
+          type: 'error',
+          message: `${error.response.data.error.message || '添加失败'}`
+        })
+      })
+    }
+  },
+  createdss () {
+    // this.getTableData()
+  }
+}
+</script>
+
+<style>
+</style>
