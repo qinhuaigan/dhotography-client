@@ -8,16 +8,20 @@
             <i class="el-input__icon el-icon-search"></i>
           </span>
         </div>
-        <el-select filterable @change="change(index)" :style="{width: item.width}" v-else-if="item.type == 'select'" v-model="models[index]"
-          :placeholder="item.placeholder">
+        <el-select filterable @change="change(index)" :style="{width: item.width}" v-else-if="item.type == 'select'"
+          v-model="models[index]" :placeholder="item.placeholder">
           <el-option v-for="(option, index) in item.options" :key="index" :label="option.label" :value="option.value">
           </el-option>
         </el-select>
-        <el-date-picker @change="change(index)" :style="{width: item.width}" v-model="models[index]" v-else-if="item.type == 'year'" type="year"
-          format="yyyy 年" value-format="yyyy" :placeholder="item.placeholder" :size='item.size'>
+        <el-date-picker @change="change(index)" :style="{width: item.width}" v-model="models[index]" v-else-if="item.type == 'year'"
+          type="year" format="yyyy 年" value-format="yyyy" :placeholder="item.placeholder" :size='item.size'>
         </el-date-picker>
-        <el-date-picker @change="change(index)" :style="{width: item.width}" v-model="models[index]" v-else-if="item.type == 'datetimerange'" type="datetimerange" :picker-options="item.pickerOptions" range-separator="至"
-          start-placeholder="开始日期" end-placeholder="结束日期" align="right">
+        <el-date-picker @change="change(index)" :style="{width: item.width}" v-model="models[index]" v-else-if="item.type == 'date'"
+          type="date" value-format="yyyy-MM-dd" :placeholder="item.placeholder" :size='item.size'>
+        </el-date-picker>
+        <el-date-picker @change="change(index)" :style="{width: item.width}" v-model="models[index]" v-else-if="item.type == 'datetimerange'"
+          type="datetimerange" :picker-options="item.pickerOptions" range-separator="至" start-placeholder="开始日期"
+          end-placeholder="结束日期" align="right">
         </el-date-picker>
       </li>
       <li class="searchItem ">

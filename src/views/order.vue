@@ -28,7 +28,7 @@ export default {
       total: 0,
       searchDatas: [{
         type: 'input', // 'input' 输入框，'select' 下拉框，
-        placeholder: '请输入标题'
+        placeholder: '请输入服务单号/客户'
       }, {
         type: 'select', // 'input' 输入框，'select' 下拉框，
         placeholder: '状态',
@@ -48,35 +48,40 @@ export default {
           label: '已完成',
           value: 2
         }]
+      }, {
+        type: 'date', // 'input' 输入框，'select' 下拉框，
+        placeholder: '预约时间'
       }],
       titles: [{
         label: '订单号',
-        prop: 'path',
-        width: '150px'
+        prop: 'orderNo',
+        width: '180px'
       }, {
         label: '服务单号',
-        prop: 'title',
-        width: '150px'
+        prop: 'themeNo',
+        width: '180px'
       }, {
         label: '服务单标题',
-        prop: 'themeNo',
-        width: '150px'
+        prop: 'themeTitle',
+        width: '200px'
       }, {
         label: '客户姓名',
-        prop: 'showPrice'
+        prop: 'customerName'
       }, {
         label: '手机号',
-        prop: 'phone'
+        prop: 'phone',
+        width: '120px'
       }, {
         label: '客户备注',
-        prop: 'phone'
+        prop: 'customerRemarks',
+        width: '200px'
       }, {
         label: '状态',
         prop: 'statusName'
       }, {
         label: '预约时间',
         prop: 'appointmentTime',
-        width: '110px'
+        width: '150px'
       }],
       tableData: [{}],
       btns: [{
@@ -90,7 +95,19 @@ export default {
         text: '标记完成',
         type: 'primary',
         fun: 'setComplete'
-      }]
+      }],
+      statusMap: {
+        '-1': '已取消',
+        '0': '申请中',
+        '1': '已预约',
+        '2': '已完成'
+      },
+      colorMap: {
+        '-1': 'cancel',
+        '0': 'warning',
+        '1': 'color',
+        '2': 'green'
+      }
     }
   },
   methods: {
@@ -189,6 +206,7 @@ export default {
       const data = {
         query: this.searchCode[0],
         status: this.searchCode[1],
+        appointmentTime: this.searchCode[2],
         currentPage: this.curentPage,
         pageSize: this.pageSize
       }
@@ -203,6 +221,10 @@ export default {
           this.total = response.data.count || 0
           this.tableData.forEach((item) => {
             item.appointmentTime = this.formatDate(item.appointmentTime, 'yyyy-MM-dd HH:mm')
+            item.statusName = this.statusMap[item.status]
+            item.style = {
+              statusName: this.colorMap[item.status]
+            }
             if (item.status === -1 || item.status === 2) {
               item.hiddenBtns = ['拒绝预约', '接受预约', '标记完成']
             } else if (item.status === 0) {
@@ -227,8 +249,8 @@ export default {
       })
     }
   },
-  createdss () {
-    // this.getTableData()
+  created () {
+    this.getTableData()
   }
 }
 </script>

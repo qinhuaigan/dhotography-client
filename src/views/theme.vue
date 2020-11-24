@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="clearfix mt20px">
-      <tableList :titles="titles" :showPagination="true" :currentPage="curentPage" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="150px"></tableList>
+      <tableList :titles="titles" :showPagination="true" :currentPage="curentPage" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="250px"></tableList>
     </div>
     <!-- 新增/编辑（主题、服务单） -->
     <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="dialogVisible" width="600px">
@@ -91,35 +91,45 @@ export default {
         placeholder: '请输入标题'
       }, {
         type: 'select', // 'input' 输入框，'select' 下拉框，
-        placeholder: '请输入系列',
+        placeholder: '请选择',
         options: [{
           label: '全部',
           type: null
         }, {
           label: '礼服',
-          value: '1'
+          value: 1
         }, {
           label: '妆容',
-          value: '2'
+          value: 2
         }, {
           label: '摄影',
-          value: '3'
+          value: 3
         }]
       }, {
         type: 'select', // 'input' 输入框，'select' 下拉框，
-        placeholder: '请输入类型',
+        placeholder: '请选择',
         options: [{
           label: '全部',
           type: null
         }, {
           label: '主题拍摄',
-          value: '1'
+          value: 1
         }, {
           label: '婚纱定制',
-          value: '2'
+          value: 2
         }, {
           label: '婚礼定制',
-          value: '3'
+          value: 3
+        }]
+      }, {
+        type: 'select', // 'input' 输入框，'select' 下拉框，
+        placeholder: '请选择',
+        options: [{
+          label: '全部',
+          type: null
+        }, {
+          label: '今日推荐',
+          value: true
         }]
       }],
       seriesList: [{
@@ -171,10 +181,12 @@ export default {
         width: '200px'
       }, {
         label: '价格',
-        prop: 'showPrice'
+        prop: 'showPrice',
+        width: '100px'
       }, {
         label: '已预订',
-        prop: 'num'
+        prop: 'num',
+        width: '80px'
       }, {
         label: '名额',
         prop: 'total'
@@ -191,6 +203,13 @@ export default {
       }],
       tableData: [],
       btns: [{
+        text: '今日推荐',
+        type: 'primary',
+        fun: 'setRecommend'
+      }, {
+        text: '取消推荐',
+        fun: 'cancelRecommend'
+      }, {
         text: '编辑',
         type: 'primary',
         fun: 'edit'
@@ -202,6 +221,39 @@ export default {
     }
   },
   methods: {
+    setRecommend (index, row) { // 设为 "今日推荐"
+      this.updateRecommend(row.id, true)
+    },
+    cancelRecommend (index, row) { // 取消 "今日推荐"
+      this.updateRecommend(row.id, false)
+    },
+    updateRecommend (id, status) { // 更新 "今日推荐" 状态
+      this.showLoading()
+      this.$axios({
+        method: 'post',
+        url: `/Themes/updateRecommend?access_token=${this.globalData.token}`,
+        data: {
+          id,
+          isRecommend: status
+        }
+      }).then((response) => {
+        if (response.data.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '设置成功'
+          })
+          this.getTableData()
+        } else {
+          this.$message({
+            type: 'error',
+            message: response.data.sg
+          })
+        }
+        this.hideLoading()
+      }).catch(() => {
+        this.hideLoading()
+      })
+    },
     pageChange (currentPage, pageSize) {
       this.curentPage = currentPage
       this.pageSize = pageSize
@@ -335,6 +387,7 @@ export default {
         query: this.searchCode[0],
         series: this.searchCode[1],
         type: this.searchCode[2],
+        isRecommend: this.searchCode[3],
         currentPage: this.curentPage,
         pageSize: this.pageSize
       }
@@ -352,7 +405,9 @@ export default {
             item.typeName = this.typeMap[item.type]
             item.showPrice = `￥${item.price.toFixed(2)}`
             item.createTime = this.formatDate(item.createTime, 'yyyy-MM-dd')
+            item.hiddenBtns = item.isRecommend ? ['今日推荐'] : ['取消推荐']
           })
+          console.log(this.tableData)
         } else {
           this.$message({
             type: 'error',

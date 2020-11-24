@@ -147,7 +147,7 @@ export default {
       this.dialogVisible = true
     },
     confirm: function () { // 添加/修改轮播图
-      const url = this.dialogTitle === '添加轮播图' ? '/Carousels/addCarousel' : '/Carousels/upfateCarousel'
+      const url = this.dialogTitle === '添加轮播图' ? '/Carousels/addCarousel' : '/Carousels/updateCarousel'
       if (this.dialogTitle === '添加轮播图' && !this.carouselInfo.file) {
         this.$message({
           type: 'warning',
