@@ -4,7 +4,7 @@
       <div class="logo"></div>
     </div>
     <div class="w70 fl text-left">
-      <h3 class="ml20px">摄影小程序后台管理平台</h3>
+      <h3 class="ml20px">摄影小程序后台管理</h3>
     </div>
     <div class="w15 fl text-right">
       <div class="userInfo" @click.stop="showList()">
@@ -80,7 +80,7 @@ export default {
       this.globalData.isLogin = false
       this.globalData.userPermission = []
       this.$router.push({
-        path: '/operatorLogin_G0'
+        path: '/login'
       })
     },
     skinPeeler () {

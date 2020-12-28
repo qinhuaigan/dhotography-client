@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import login from '../views/login'
+// import login from '../views/login'
+import login2 from '../views/login2'
+import regs from '../views/regs'
 import home from '../views/home'
 import homeContent from '../views/homeContent'
 import carousel from '../views/carousel'
@@ -22,7 +24,11 @@ const router = new Route({
   }, {
     path: '/login',
     name: 'login',
-    component: login
+    component: login2
+  }, {
+    path: '/signUp',
+    name: 'signUp',
+    component: regs
   }, {
     path: '/carouselHome',
     name: 'carouselHome',

@@ -2,7 +2,7 @@
   <div id="theme">
     <div class="clearfix">
       <div class="fl">
-        <search :searchDatas="searchDatas" @search="searchChange"></search>
+        <search :searchDatas="searchDatas" :searchCode="searchCode" @search="searchChange"></search>
       </div>
       <div class="fr">
         <el-button type="primary" @click="addNewCarousel()">添加</el-button>
@@ -94,7 +94,7 @@ export default {
         placeholder: '请选择',
         options: [{
           label: '全部',
-          type: null
+          value: null
         }, {
           label: '礼服',
           value: 1
@@ -110,7 +110,7 @@ export default {
         placeholder: '请选择',
         options: [{
           label: '全部',
-          type: null
+          value: null
         }, {
           label: '主题拍摄',
           value: 1
@@ -126,7 +126,7 @@ export default {
         placeholder: '请选择',
         options: [{
           label: '全部',
-          type: null
+          value: null
         }, {
           label: '今日推荐',
           value: true
