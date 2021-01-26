@@ -87,10 +87,10 @@ export default {
     }
   },
   methods: {
-    handleClick: function (fun, index, data) {
+    handleClick (fun, index, data) {
       this[fun](index, data)
     },
-    remove: function (index, data) {
+    remove (index, data) {
       this.$confirm('您确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -123,13 +123,13 @@ export default {
           })
       })
     },
-    handleRemove: function () {
+    handleRemove () {
       this.carouselInfo.file = null
     },
-    selectFile: function (file, fileList) {
+    selectFile (file, fileList) {
       this.carouselInfo.file = file.raw
     },
-    edit: function (index, data) {
+    edit (index, data) {
       this.dialogTitle = '编辑轮播图'
       this.dialogVisible = true
       this.carouselInfo = JSON.parse(JSON.stringify(data))
@@ -140,7 +140,7 @@ export default {
         }
       ]
     },
-    addNewCarousel: function () {
+    addNewCarousel () {
       this.fileList = []
       this.carouselInfo = {
         title: null,
@@ -151,7 +151,7 @@ export default {
       this.dialogTitle = '添加轮播图'
       this.dialogVisible = true
     },
-    confirm: function () {
+    confirm () {
       // 添加/修改轮播图
       const url = this.dialogTitle === '添加轮播图' ? '/Carousels/addCarousel' : '/Carousels/updateCarousel'
       if (this.dialogTitle === '添加轮播图' && !this.carouselInfo.file) {
@@ -173,46 +173,43 @@ export default {
         url: `${url}?access_token=${this.globalData.token}`,
         data: this.formatFormData(data),
         maxContentLength: Infinity
-      })
-        .then(response => {
-          if (response.data.code === 0) {
-            this.$message({
-              type: 'success',
-              message: this.dialogTitle === '添加轮播图' ? '添加成功' : '保存成功'
+      }).then(response => {
+        if (response.data.code === 0) {
+          this.$message({
+            type: 'success',
+            message: this.dialogTitle === '添加轮播图' ? '添加成功' : '保存成功'
+          })
+          if (this.dialogTitle === '添加轮播图') {
+            this.tableData.push(response.data.data)
+            this.tableData = this.tableData.sort((a, b) => {
+              return a.sort - b.sort
             })
-            if (this.dialogTitle === '添加轮播图') {
-              this.tableData.push(response.data.data)
-              this.tableData = this.tableData.sort((a, b) => {
-                return a.sort - b.sort
-              })
-            } else {
-              for (let i = 0; i < this.tableData.length; i++) {
-                if (this.tableData[i].id === this.carouselInfo.id) {
-                  this.tableData.splice(i, 1, response.data.data)
-                  break
-                }
-              }
-              console.log(this.tableData)
-              this.tableData = this.tableData
-            }
-            this.dialogVisible = false
           } else {
-            this.$message({
-              type: 'error',
-              message: response.data.msg
-            })
+            for (let i = 0; i < this.tableData.length; i++) {
+              if (this.tableData[i].id === this.carouselInfo.id) {
+                this.tableData.splice(i, 1, response.data.data)
+                break
+              }
+            }
+            this.tableData = this.tableData
           }
-          this.hideLoading()
-        })
-        .catch(error => {
-          this.hideLoading()
+          this.dialogVisible = false
+        } else {
           this.$message({
             type: 'error',
-            message: `${error.response.data.error.message || '添加失败'}`
+            message: response.data.msg
           })
+        }
+        this.hideLoading()
+      }).catch(error => {
+        this.hideLoading()
+        this.$message({
+          type: 'error',
+          message: `${error.response.data.error.message || '添加失败'}`
         })
+      })
     },
-    getTableData: function () {
+    getTableData () {
       this.showLoading()
       this.$axios({
         method: 'post',
@@ -220,28 +217,26 @@ export default {
         data: {
           type: this.carouselType
         }
-      })
-        .then(response => {
-          if (response.data.code === 0) {
-            this.tableData = response.data.data
-          } else {
-            this.$message({
-              type: 'error',
-              message: response.data.msg
-            })
-          }
-          this.hideLoading()
-        })
-        .catch(error => {
-          this.hideLoading()
+      }).then(response => {
+        if (response.data.code === 0) {
+          this.tableData = response.data.data
+        } else {
           this.$message({
             type: 'error',
-            message: `${error.response.data.error.message || '添加失败'}`
+            message: response.data.msg
           })
+        }
+        this.hideLoading()
+      }).catch(error => {
+        this.hideLoading()
+        this.$message({
+          type: 'error',
+          message: `${error.response.data.error.message || '添加失败'}`
         })
+      })
     }
   },
-  created: function () {
+  created () {
     this.getTableData()
   }
 }

@@ -8,7 +8,7 @@
         <el-table-column :align="item.align || 'center'" v-for="(item, i) in titles" :label="item.label" :width="item.width"
           :minWidth="item.minWidth" :key="`${item.prop}_${i}`">
           <template slot-scope="scope">
-            <el-image v-if="item.type == 'image'" style="width: 100%; height: 100%; vertical-align: middle;" :src="scope.row[item.prop] === '*' ? defaultImg : `${baseURL}${scope.row[item.prop]}`"
+            <el-image v-if="item.type == 'image'" style="width: 100%; height: 100%; vertical-align: middle;" :src="`${baseURL}${scope.row[item.prop]}`"
               :preview-src-list="[`${baseURL}${scope.row[item.prop]}`]">
             </el-image>
             <el-switch v-else-if="item.type == 'switch'" v-model="scope.row[item.prop]" @change="change(scope.row)"></el-switch>

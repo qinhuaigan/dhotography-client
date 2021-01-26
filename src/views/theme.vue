@@ -264,10 +264,10 @@ export default {
       this.curentPage = 1
       this.getTableData()
     },
-    handleClick: function (fun, index, data) {
+    handleClick (fun, index, data) {
       this[fun](index, data)
     },
-    remove: function (index, data) {
+    remove (index, data) {
       this.$confirm('您确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -275,7 +275,7 @@ export default {
       }).then(() => {
         this.$axios({
           method: 'post',
-          url: `/Carousels/removeCarousel?access_token=${this.globalData.token}`,
+          url: `/Themes/removeTheme?access_token=${this.globalData.token}`,
           data: {
             token: this.globalData.token,
             id: data.id
@@ -298,13 +298,13 @@ export default {
         })
       })
     },
-    handleRemove: function () {
+    handleRemove () {
       this.themeInfo.file = null
     },
-    selectFile: function (file, fileList) {
+    selectFile (file, fileList) {
       this.themeInfo.file = file.raw
     },
-    edit: function (index, data) {
+    edit (index, data) {
       this.dialogTitle = '编辑主题/服务单'
       this.dialogVisible = true
       this.themeInfo = JSON.parse(JSON.stringify(data))
@@ -313,7 +313,7 @@ export default {
         url: `${this.baseURL}${data.path}`
       }]
     },
-    addNewCarousel: function () {
+    addNewCarousel () {
       this.fileList = []
       this.themeInfo = {
         series: null, // 系列：1（礼服）；2（妆容）；3（摄影）
@@ -329,7 +329,7 @@ export default {
       this.dialogTitle = '添加服务单'
       this.dialogVisible = true
     },
-    confirm: function () { // 添加/修改轮播图
+    confirm () { // 添加/修改服务单
       const url = this.dialogTitle === '添加服务单' ? '/Themes/addTheme' : '/Themes/updateTheme'
       let msg = null
       if (this.dialogTitle === '添加服务单' && !this.themeInfo.file) {
@@ -382,7 +382,7 @@ export default {
         })
       })
     },
-    getTableData: function () {
+    getTableData () {
       const data = {
         query: this.searchCode[0],
         series: this.searchCode[1],
@@ -407,7 +407,6 @@ export default {
             item.createTime = this.formatDate(item.createTime, 'yyyy-MM-dd')
             item.hiddenBtns = item.isRecommend ? ['今日推荐'] : ['取消推荐']
           })
-          console.log(this.tableData)
         } else {
           this.$message({
             type: 'error',
@@ -424,7 +423,7 @@ export default {
       })
     }
   },
-  created: function () {
+  created () {
     this.getTableData()
   }
 }
