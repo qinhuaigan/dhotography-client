@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import login from '../views/login'
-import login2 from '../views/login2'
+import login from '../views/login'
+// import login2 from '../views/login2'
 import regs from '../views/regs'
 import home from '../views/home'
 import homeContent from '../views/homeContent'
@@ -24,7 +24,7 @@ const router = new Route({
   }, {
     path: '/login',
     name: 'login',
-    component: login2
+    component: login
   }, {
     path: '/signUp',
     name: 'signUp',

@@ -93,17 +93,17 @@ export default {
         type: 'select', // 'input' 输入框，'select' 下拉框，
         placeholder: '请选择',
         options: [{
-          label: '全部',
-          value: null
-        }, {
-          label: '礼服',
+          label: '街拍',
           value: 1
         }, {
-          label: '妆容',
+          label: '写真',
           value: 2
         }, {
-          label: '摄影',
+          label: '棚拍',
           value: 3
+        }, {
+          label: '婚庆',
+          value: 4
         }]
       }, {
         type: 'select', // 'input' 输入框，'select' 下拉框，
@@ -112,13 +112,13 @@ export default {
           label: '全部',
           value: null
         }, {
-          label: '主题拍摄',
+          label: '校园主题',
           value: 1
         }, {
-          label: '婚纱定制',
+          label: '海景主题',
           value: 2
         }, {
-          label: '婚礼定制',
+          label: '纪念主题',
           value: 3
         }]
       }, {
@@ -133,23 +133,26 @@ export default {
         }]
       }],
       seriesList: [{
-        label: '礼服',
-        value: '1'
+        label: '街拍',
+        value: 1
       }, {
-        label: '妆容',
-        value: '2'
+        label: '写真',
+        value: 2
       }, {
-        label: '摄影',
-        value: '3'
+        label: '棚拍',
+        value: 3
+      }, {
+        label: '婚庆',
+        value: 4
       }],
       typeList: [{
-        label: '主题拍摄',
+        label: '校园主题',
         value: '1'
       }, {
-        label: '婚纱定制',
+        label: '海景主题',
         value: '2'
       }, {
-        label: '婚礼定制',
+        label: '纪念主题',
         value: '3'
       }],
       fileList: [],
@@ -157,14 +160,15 @@ export default {
       dialogTitle: null,
       dialogVisible: false,
       seriesMap: { // 系列匹配
-        '1': '礼服',
-        '2': '妆容',
-        '3': '摄影'
+        '1': '街拍',
+        '2': '写真',
+        '3': '棚拍',
+        '4': '婚庆'
       },
       typeMap: { // 系列匹配
-        '1': '主题拍摄',
-        '2': '婚纱定制',
-        '3': '婚礼定制'
+        '1': '校园主题',
+        '2': '海景主题',
+        '3': '纪念主题'
       },
       titles: [{
         label: '图片',

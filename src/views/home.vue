@@ -39,7 +39,7 @@ export default {
         icon: 'el-icon-s-data',
         path: '/carousel'
       }, {
-        title: '服务单管理',
+        title: '服务套餐',
         icon: 'el-icon-tickets',
         path: '/theme'
       }, {
