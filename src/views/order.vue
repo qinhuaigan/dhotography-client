@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="clearfix mt20px">
-      <tableList :titles="titles" :showPagination="true" :currentPage="curentPage" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="200px"></tableList>
+      <tableList :titles="titles" :showPagination="true" :currentPage="curentPage" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="300px"></tableList>
     </div>
   </div>
 </template>
@@ -88,21 +88,26 @@ export default {
         text: '拒绝预约',
         fun: 'refuse'
       }, {
+        text: '订单取消',
+        fun: 'refuse'
+      }, {
         text: '接受预约',
         type: 'primary',
         fun: 'accept'
       }, {
-        text: '标记完成',
-        type: 'primary',
+        text: '订单完成',
+        type: 'success',
         fun: 'setComplete'
       }],
       statusMap: {
+        '-2': '已取消',
         '-1': '已取消',
         '0': '申请中',
         '1': '已预约',
         '2': '已完成'
       },
       colorMap: {
+        '-2': 'cancel',
         '-1': 'cancel',
         '0': 'warning',
         '1': 'color',
@@ -112,7 +117,7 @@ export default {
   },
   methods: {
     refuse (index, row) { // 拒绝预约
-      this.$prompt('拒绝本次预约，可输入备注', '提示', {
+      this.$prompt('是否取消该订单，可输入备注', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
       }).then(({ value }) => {
@@ -145,64 +150,33 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$axios({
-          method: 'post',
-          url: `/Carousels/removeCarousel?access_token=${this.globalData.token}`,
-          data: {
-            token: this.globalData.token,
-            id: data.id
-          }
-        }).then((response) => {
-          if (response.data.code === 0) {
-            this.tableData.splice(index, 1)
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-          } else {
-            this.$message({
-              type: 'error',
-              message: response.data.msg
-            })
-          }
-        }).catch(() => {
-          this.hideLoading()
-        })
-      })
-    },
-    updateStatus (id, status, remarks) { // 更新订单状态
-      this.showLoading()
-      this.$axios({
-        method: 'post',
-        url: `/Orders/updateOrder?access_token=${this.globalData.token}`,
-        data: {
-          id,
-          status,
-          businessRemarks: remarks
-        }
-      }).then((response) => {
-        if (response.data.code === 0) {
+        this.$postData('/Carousels/removeCarousel', {
+          token: this.globalData.token,
+          id: data.id
+        }).then((result) => {
+          this.tableData.splice(index, 1)
           this.$message({
             type: 'success',
-            message: '更新成功'
+            message: '删除成功'
           })
-          this.getTableData()
-        } else {
-          this.$message({
-            type: 'error',
-            message: response.data.msg
-          })
-        }
-        this.hideLoading()
-      }).catch((error) => {
-        this.hideLoading()
-        this.$message({
-          type: 'error',
-          message: `${error.response.data.error.message || '添加失败'}`
         })
       })
     },
-    getTableData () {
+    async updateStatus (id, status, remarks) { // 更新订单状态
+      const result = await this.$postData('/Orders/updateOrder', {
+        id,
+        status,
+        businessRemarks: remarks
+      })
+      if (result) {
+        this.$message({
+          type: 'success',
+          message: '更新成功'
+        })
+        this.getTableData()
+      }
+    },
+    async getTableData () {
       const data = {
         query: this.searchCode[0],
         status: this.searchCode[1],
@@ -210,43 +184,25 @@ export default {
         currentPage: this.curentPage,
         pageSize: this.pageSize
       }
-      this.showLoading()
-      this.$axios({
-        method: 'post',
-        url: `/Orders/getOrders?access_token=${this.globalData.token}`,
-        data
-      }).then((response) => {
-        if (response.data.code === 0) {
-          this.tableData = response.data.result
-          this.total = response.data.count || 0
-          this.tableData.forEach((item) => {
-            item.appointmentTime = this.formatDate(item.appointmentTime, 'yyyy-MM-dd HH:mm')
-            item.statusName = this.statusMap[item.status]
-            item.style = {
-              statusName: this.colorMap[item.status]
-            }
-            if (item.status === -1 || item.status === 2) {
-              item.hiddenBtns = ['拒绝预约', '接受预约', '标记完成']
-            } else if (item.status === 0) {
-              item.hiddenBtns = ['标记完成']
-            } else if (item.status === 1) {
-              item.hiddenBtns = ['拒绝预约', '接受预约']
-            }
-          })
-        } else {
-          this.$message({
-            type: 'error',
-            message: response.data.msg
-          })
-        }
-        this.hideLoading()
-      }).catch((error) => {
-        this.hideLoading()
-        this.$message({
-          type: 'error',
-          message: `${error.response.data.error.message || '添加失败'}`
+      const result = await this.$postData('/Orders/getOrders', data)
+      if (result) {
+        this.tableData = result.result
+        this.total = result.count || 0
+        this.tableData.forEach((item) => {
+          item.appointmentTime = this.formatDate(item.appointmentTime, 'yyyy-MM-dd HH:mm')
+          item.statusName = this.statusMap[item.status]
+          item.style = {
+            statusName: this.colorMap[item.status]
+          }
+          if (item.status === -1 || item.status === -2 || item.status === 2) {
+            item.hiddenBtns = ['拒绝预约', '接受预约', '订单完成', '订单取消']
+          } else if (item.status === 0) {
+            item.hiddenBtns = ['订单完成', '订单取消']
+          } else if (item.status === 1) {
+            item.hiddenBtns = ['拒绝预约', '接受预约']
+          }
         })
-      })
+      }
     }
   },
   created () {

@@ -15,7 +15,7 @@
             <div class="customizeDiv cell" :class="{ 'el-tooltip': !showAll}" v-else :style="customizeStyle(scope.row, item.prop)">{{scope.row[item.prop]}}</div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" :align="operateBtnAlign || 'center'" fixed="right" :width="operateWidth" v-if="btns && btns.length > 0">
+        <el-table-column label="操作" :align="operateBtnAlign || 'left'" fixed="right" :width="operateWidth" v-if="btns && btns.length > 0">
           <template slot-scope="scope">
             <div v-if="operateBtnBlock">
               <div :class="{mb5px: i < btns.length - 1}" v-for="(btn, i) in btns" :key="`${btn.text}_${scope.$index}_${i}`"

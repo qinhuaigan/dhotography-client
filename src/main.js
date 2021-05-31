@@ -123,6 +123,40 @@ Vue.prototype.formatFormData = function (data) {
   return form
 }
 
+Vue.prototype.$postData = function(url, data, isNotForm) { // post 请求数据
+  data = data || {}
+  data = Object.assign(data, {
+    token: globalData.token
+  })
+  // isNotForm：参数提交方式不是 'formdata'
+  return new Promise((resolve) => {
+    this.showLoading()
+    axios({
+      method: 'post',
+      url: `${url}?access_token=${globalData.token}`,
+      data
+    }).then((response) => {
+      if (response.data.code === 0) {
+        resolve(response.data)
+      } else {
+        Message({
+          type: 'error',
+          message: response.data.msg
+        })
+        resolve(false)
+      }
+      this.hideLoading()
+    }).catch((error) => {
+      this.hideLoading()
+      Message({
+        type: 'error',
+        message: `${error.response.data.error.message}`
+      })
+      resolve(false)
+    })
+  })
+}
+
 Vue.prototype.formatDate = function (value, type) {
   // 日期格式过滤器
   if (!value) {
