@@ -9,14 +9,13 @@
       </div>
     </div>
     <div class="clearfix mt20px">
-      <tableList :titles="titles" :showPagination="true" :currentPage="curentPage" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="250px"></tableList>
+      <tableList :titles="titles" :showAll="true" :showPagination="true" :currentPage="curentPage" :operateBtnBlock="true" operateBtnAlign="center" @pageChange="pageChange" :pageSize="pageSize" :total="total" :tableData="tableData" :btns="btns" @handleClick="handleClick" operateWidth="150px"></tableList>
     </div>
     <!-- 新增/编辑（主题、服务单） -->
-    <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="dialogVisible" width="600px">
+    <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="dialogVisible" width="800px">
       <el-form v-if="dialogVisible" ref="form" :model="themeInfo" label-width="80px">
         <el-form-item label="*图片">
-          <el-upload class="upload-demo" action="" :on-change="selectFile" :file-list="fileList" :limit="1"
-            :auto-upload="false" :on-remove="handleRemove" list-type="picture">
+          <el-upload class="upload-demo" action="" :on-change="selectFile" :file-list="fileList" :auto-upload="false" :on-remove="handleRemove" list-type="picture">
             <el-button size="small" type="primary">选择图片</el-button>
           </el-upload>
         </el-form-item>
@@ -62,11 +61,34 @@
         <el-form-item label="*联系电话">
           <el-input v-model="themeInfo.phone" placeholder="请输入联系电话"></el-input>
         </el-form-item>
+        <el-form-item label="拍摄地点">
+          <el-row class="margin0px" :gutter="10">
+            <el-col :span="24">
+              <el-input v-model="keyword" @focus="showSearch = true" @blur="showSearch = false" placeholder="请输入关键字检索"></el-input>
+            </el-col>
+            <el-col :span="24">
+              <baidu-map class="mapView mt20px" scroll-wheel-zoom :center="center" :zoom="15" @click="submitPosition">
+                <bm-local-search :autoViewport="true" v-if="showSearch && keyword" class="localSearchView" :keyword="keyword" :pageCapacity="5"
+                  :forceLocal="true" :auto-viewport="false" :location="center"></bm-local-search>
+                <bm-city-list anchor="BMAP_ANCHOR_TOP_LEFT"></bm-city-list>
+                <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
+                <bm-marker v-if="themeInfo && themeInfo.longitude" :position="{lng: themeInfo.longitude, lat: themeInfo.latitude}"
+                  :dragging="true" animation="BMAP_ANIMATION_BOUNCE"></bm-marker>
+              </baidu-map>
+            </el-col>
+          </el-row>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button size="small" @click="dialogVisible = false" placeholder="请输入联系电话">取 消</el-button>
         <el-button size="small" type="primary" @click="confirm()">{{dialogTitle === '添加服务单' ? '确 定' : '保 存'}}</el-button>
       </span>
+    </el-dialog>
+    <!-- 消息推送历史 -->
+    <el-dialog title="推送历史" :close-on-click-modal="false" :visible.sync="historyDialogVisible" width="600px">
+      <el-timeline>
+        <el-timeline-item v-for="(activity, index) in messageList" :key="index" :timestamp="formatDate(activity.createTime)">{{activity.remarks}}</el-timeline-item>
+      </el-timeline>
     </el-dialog>
   </div>
 </template>
@@ -80,8 +102,10 @@ export default {
     tableList,
     search
   },
-  data: function () {
+  data: function() {
     return {
+      showSearch: false,
+      historyDialogVisible: false,
       searchCode: [],
       curentPage: 1,
       pageSize: 10,
@@ -94,16 +118,16 @@ export default {
         placeholder: '请选择',
         options: [{
           label: '街拍',
-          value: 1
+          value: '1'
         }, {
           label: '写真',
-          value: 2
+          value: '2'
         }, {
           label: '棚拍',
-          value: 3
+          value: '3'
         }, {
           label: '婚庆',
-          value: 4
+          value: '4'
         }]
       }, {
         type: 'select', // 'input' 输入框，'select' 下拉框，
@@ -113,13 +137,13 @@ export default {
           value: null
         }, {
           label: '校园主题',
-          value: 1
+          value: '1'
         }, {
           label: '海景主题',
-          value: 2
+          value: '2'
         }, {
           label: '纪念主题',
-          value: 3
+          value: '3'
         }]
       }, {
         type: 'select', // 'input' 输入框，'select' 下拉框，
@@ -134,16 +158,16 @@ export default {
       }],
       seriesList: [{
         label: '街拍',
-        value: 1
+        value: '1'
       }, {
         label: '写真',
-        value: 2
+        value: '2'
       }, {
         label: '棚拍',
-        value: 3
+        value: '3'
       }, {
         label: '婚庆',
-        value: 4
+        value: '4'
       }],
       typeList: [{
         label: '校园主题',
@@ -182,7 +206,8 @@ export default {
       }, {
         label: '标题',
         prop: 'title',
-        width: '200px'
+        width: '200px',
+        align: 'left'
       }, {
         label: '价格',
         prop: 'showPrice',
@@ -211,27 +236,82 @@ export default {
         type: 'primary',
         fun: 'setRecommend'
       }, {
-        text: '取消推荐',
-        fun: 'cancelRecommend'
+        text: '消息推送',
+        type: 'primary',
+        fun: 'sendMsg'
       }, {
-        text: '编辑',
+        text: '编辑套餐',
         type: 'primary',
         fun: 'edit'
       }, {
-        text: '删除',
+        text: '删除套餐',
         type: 'danger',
         fun: 'remove'
-      }]
+      }, {
+        text: '取消推荐',
+        fun: 'cancelRecommend'
+      }, {
+        text: '推送记录',
+        fun: 'getSendHistory'
+      }],
+      messageList: [], // 消息推送历史
+      center: {
+        lng: 109.394097,
+        lat: 24.314923
+      },
+      keyword: null
     }
   },
   methods: {
-    setRecommend (index, row) { // 设为 "今日推荐"
+    submitPosition(e) { // 提交位置
+      this.themeInfo.longitude = e.point.lng
+      this.themeInfo.latitude = e.point.lat
+      this.$forceUpdate()
+    },
+    async getSendHistory(index, row) { // 获取消息推送记录
+      const result = await this.$postData('/Messages/getMessageByTheme', {
+        themeId: row.id
+      })
+      if (result) {
+        this.messageList = result.data
+        if (!this.messageList || this.messageList.length === 0) {
+          this.$message({
+            type: 'warning',
+            message: '暂无推送历史'
+          })
+          return
+        }
+        this.historyDialogVisible = true
+      }
+    },
+    sendMsg(index, row) { // 消息推送
+      this.$prompt('请输入消息内容', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(({
+        value
+      }) => {
+        const data = {
+          themeId: row.id,
+          remarks: value
+        }
+        this.$postData('/Messages/sendMessage', data).then((result) => {
+          if (result) {
+            this.$message({
+              type: 'success',
+              message: '消息已推送'
+            })
+          }
+        })
+      }).catch(() => {})
+    },
+    setRecommend(index, row) { // 设为 "今日推荐"
       this.updateRecommend(row.id, true)
     },
-    cancelRecommend (index, row) { // 取消 "今日推荐"
+    cancelRecommend(index, row) { // 取消 "今日推荐"
       this.updateRecommend(row.id, false)
     },
-    updateRecommend (id, status) { // 更新 "今日推荐" 状态
+    updateRecommend(id, status) { // 更新 "今日推荐" 状态
       this.showLoading()
       this.$axios({
         method: 'post',
@@ -258,20 +338,20 @@ export default {
         this.hideLoading()
       })
     },
-    pageChange (currentPage, pageSize) {
+    pageChange(currentPage, pageSize) {
       this.curentPage = currentPage
       this.pageSize = pageSize
       this.getTableData()
     },
-    searchChange (models) {
+    searchChange(models) {
       this.searchCode = models
       this.curentPage = 1
       this.getTableData()
     },
-    handleClick (fun, index, data) {
+    handleClick(fun, index, data) {
       this[fun](index, data)
     },
-    remove (index, data) {
+    remove(index, data) {
       this.$confirm('您确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -302,22 +382,32 @@ export default {
         })
       })
     },
-    handleRemove () {
-      this.themeInfo.file = null
+    handleRemove(file) {
+      if (!file.raw) {
+        // "已上传" 的文件，需要调用借口删除
+        this.$axios({
+          method: 'delete',
+          url: `/Containers/${this.themeInfo.id}/files/${file.name}`
+        })
+      }
     },
-    selectFile (file, fileList) {
-      this.themeInfo.file = file.raw
+    selectFile(file, fileList) {
+      this.fileList = fileList
     },
-    edit (index, data) {
+    edit(index, data) {
+      this.center = data.longitude ? { lng: data.longitude, lat: data.latitude } : { lng: 109.394097, lat: 24.314923 }
       this.dialogTitle = '编辑主题/服务单'
       this.dialogVisible = true
       this.themeInfo = JSON.parse(JSON.stringify(data))
-      this.fileList = [{
-        name: data.filename,
-        url: `${this.baseURL}${data.path}`
-      }]
+      this.fileList = data.files.reduce((total, item) => {
+        total.push({
+          name: item.filename,
+          url: `${this.baseURL}${item.path}`
+        })
+        return total
+      }, [])
     },
-    addNewCarousel () {
+    addNewCarousel() {
       this.fileList = []
       this.themeInfo = {
         series: null, // 系列：1（礼服）；2（妆容）；3（摄影）
@@ -333,10 +423,10 @@ export default {
       this.dialogTitle = '添加服务单'
       this.dialogVisible = true
     },
-    confirm () { // 添加/修改服务单
+    async confirm() { // 添加/修改服务单
       const url = this.dialogTitle === '添加服务单' ? '/Themes/addTheme' : '/Themes/updateTheme'
       let msg = null
-      if (this.dialogTitle === '添加服务单' && !this.themeInfo.file) {
+      if (!this.fileList || this.fileList.length === 0) {
         msg = '请选择图片'
       } else if (!this.themeInfo.title) {
         msg = '请输入标题'
@@ -358,35 +448,24 @@ export default {
         })
         return
       }
-      this.showLoading()
-      this.$axios({
-        method: 'post',
-        url: `${url}?access_token=${this.globalData.token}`,
-        data: this.formatFormData(this.themeInfo)
-      }).then((response) => {
-        if (response.data.code === 0) {
-          this.$message({
-            type: 'success',
-            message: this.dialogTitle === '添加服务单' ? '添加成功' : '保存成功'
-          })
-          this.getTableData()
-          this.dialogVisible = false
-        } else {
-          this.$message({
-            type: 'error',
-            message: response.data.msg
-          })
-        }
-        this.hideLoading()
-      }).catch((error) => {
-        this.hideLoading()
+      const result = await this.$postData(url, this.themeInfo)
+      if (result) {
         this.$message({
-          type: 'error',
-          message: `${error.response.data.error.message || '添加失败'}`
+          type: 'success',
+          message: this.dialogTitle === '添加服务单' ? '添加成功' : '保存成功'
         })
-      })
+        this.dialogVisible = false
+      }
+      // 成功后，单独上传文件
+      await this.uploadFile(result.data.id, this.fileList.reduce((total, item) => {
+        if (item.raw) {
+          total.push(item.raw)
+        }
+        return total
+      }, []))
+      this.getTableData()
     },
-    getTableData () {
+    getTableData() {
       const data = {
         query: this.searchCode[0],
         series: this.searchCode[1],
@@ -410,6 +489,7 @@ export default {
             item.showPrice = `￥${item.price.toFixed(2)}`
             item.createTime = this.formatDate(item.createTime, 'yyyy-MM-dd')
             item.hiddenBtns = item.isRecommend ? ['今日推荐'] : ['取消推荐']
+            item.path = item.files[0] ? item.files[0].path : null
           })
         } else {
           this.$message({
@@ -427,11 +507,15 @@ export default {
       })
     }
   },
-  created () {
+  created() {
     this.getTableData()
   }
 }
 </script>
 
-<style>
+<style scoped>
+  .mapView {
+    width: 100%;
+    height: 400px;
+  }
 </style>

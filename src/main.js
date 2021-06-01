@@ -11,6 +11,7 @@ import './assets/css/style.css'
 import animated from 'animate.css'
 import globalData from '../utils/globalData.js'
 import store from '../store/index.js'
+import BaiduMap from 'vue-baidu-map'
 
 globalData.token = localStorage.getItem('token') || ''
 globalData.applicationURL = localStorage.getItem('applicationURL')
@@ -31,6 +32,10 @@ Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 Vue.use(animated)
+Vue.use(BaiduMap, {
+  // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */
+  ak: 'KyZXFnym76iLdAG7OvNI4kTq3H8BHZnm'
+})
 
 Vue.prototype.Loading = null
 Vue.prototype.showLoading = function (text) {
@@ -75,7 +80,7 @@ Vue.prototype.checkPermissionExist = function (id) {
 }
 
 // 上传文件，files 为源文件数组，例：files = [file1, file2]
-Vue.prototype.uploadFile = async function (files) {
+Vue.prototype.uploadFile = async function (container, files) {
   if (!files || files.length === 0) {
     return []
   }
@@ -87,7 +92,7 @@ Vue.prototype.uploadFile = async function (files) {
         form.append('file', files[i])
         axios({
           method: 'post',
-          url: `/file/upload?token=${this.globalData.token}`,
+          url: `/Containers/${container}/upload`,
           data: form
         }).then((response) => {
           if (response.data.code === 0) {
