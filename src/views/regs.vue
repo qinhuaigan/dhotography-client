@@ -150,7 +150,7 @@ export default {
   #regbg {
     width: 100%;
     height: 100%;
-    background-image: url(../assets/img/web.jpg);
+    background-image: url(/static/img/web.jpg);
     background-size: cover;
     background-position: center;
     position: fixed;
@@ -296,7 +296,7 @@ export default {
 
   .regbg_right {
     flex: 7;
-    background-image: url(../assets/img/webrght.jpg);
+    background-image: url(/static/img/webrght.jpg);
     box-shadow: 0 0 5px 2px #145fc5;
     background-size: cover;
     background-position: center;

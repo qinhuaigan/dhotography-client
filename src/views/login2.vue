@@ -118,7 +118,7 @@ export default {
 #loginbg {
   width: 100%;
   height: 100%;
-  background-image: url(../assets/img/web.jpg);
+  background-image: url(./static/img/web.jpg);
   background-size: cover;
   background-position: center;
   position: fixed;
@@ -294,7 +294,7 @@ export default {
 .right {
   flex: 7;
   position: relative;
-  background: url(../assets/img/webrght.jpg);
+  background: url(/static/img/webrght.jpg);
   background-size: cover;
   /* border: 4px solid #0d5a9e; */
   box-shadow: 0 0 5px 2px #145fc5;

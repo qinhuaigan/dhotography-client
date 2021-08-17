@@ -133,7 +133,7 @@ export default {
     height: 100%;
     left: 0;
     top: 0;
-    background-image: url(../assets/img/loginBg.jpg);
+    background-image: url(../../static/img/loginBg.jpg);
     background-size: cover;
     background-position: center;
   }
