@@ -51,7 +51,7 @@ export default {
         width: '200px'
       }, {
         label: '住址',
-        prop: 'address'
+        prop: 'addressName'
       }, {
         label: '注册时间',
         prop: 'createTime',
@@ -104,6 +104,10 @@ export default {
             item.genderName = this.genderMap[item.gender]
             item.identityName = this.identityMap[item.identity]
             item.createTime = this.formatDate(item.createTime, 'yyyy-MM-dd')
+            item.addressName = `${item.provincialArea ? item.provincialArea.reduce((total, item2, i) => {
+              total += i > 0 ? `-${item2}` : item2
+              return total
+            }, '') : ''}${item.address ? `-${item.address}` : ''}`
           })
         } else {
           this.$message({
