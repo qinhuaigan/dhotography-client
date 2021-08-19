@@ -63,18 +63,19 @@ export default {
         if (response.data.code === 0) {
           this.globalData.token = response.data.data
           this.globalData.isLogin = true
+          if (this.autoLogin) {
+            localStorage.setItem('token', response.data.data)
+            localStorage.setItem('autoLogin', this.autoLogin)
+            localStorage.setItem('username', this.username)
+            localStorage.setItem('password', this.password)
+          }
           this.getUserInfo().then((result) => {
             this.$store.state.userInfo = result
             this.$message({
               type: 'success',
               message: '登录成功'
             })
-            if (this.autoLogin) {
-              localStorage.setItem('token', response.data.data)
-              localStorage.setItem('autoLogin', this.autoLogin)
-              localStorage.setItem('username', this.username)
-              localStorage.setItem('password', this.password)
-            }
+
             this.$router.push({
               path: '/home'
             })
