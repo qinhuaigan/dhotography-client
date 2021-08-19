@@ -40,7 +40,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="*系列">
-              <el-select v-model="themeInfo.series" placeholder="请选择">
+              <el-select class="w100" v-model="themeInfo.series" placeholder="请选择系列">
                 <el-option v-for="item in seriesList" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
@@ -48,7 +48,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="*类型">
-              <el-select v-model="themeInfo.type" placeholder="请选择">
+              <el-select class="w100" v-model="themeInfo.type" placeholder="请选择类型">
                 <el-option v-for="item in typeList" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
