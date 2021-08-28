@@ -1,7 +1,7 @@
 <template>
   <div id="loginbg" class="loginbg">
     <div class="content clearfix">
-      <div class="loginText">摄影小程序后台管理</div>
+      <div class="loginText">星缘工作室后台</div>
       <div class="login clearfix">
         <div class="login_top">
           <span class="account active">账号密码登录</span>

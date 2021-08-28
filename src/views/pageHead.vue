@@ -2,11 +2,11 @@
   <div id="header" class="operatorHeader clearfix" :style="{'background': `${backgroundColor}`}">
     <div class="w15 fl text-center">
       <!-- <div class="logo"></div> -->
-      <h3 class="ml20px">星缘摄影工作室后台</h3>
+      <h3 class="ml20px">星缘工作室后台</h3>
     </div>
     <div class="w70 fl text-left">
       &nbsp;
-      <!-- <h3 class="ml20px">星缘摄影工作室后台</h3> -->
+      <!-- <h3 class="ml20px">星缘工作室后台</h3> -->
     </div>
     <div class="w15 fl text-right">
       <div class="userInfo" @click.stop="showList()">

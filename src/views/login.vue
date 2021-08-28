@@ -1,7 +1,7 @@
 <template>
   <div id="loginBg" class="loginBg">
     <div class="loginBox">
-      <h3 class="login-title">星星摄影服务平台</h3>
+      <h3 class="login-title">星缘工作室后台</h3>
       <div class="input">
         <input v-model="username" placeholder="请输入手机号/邮箱" />
       </div>
