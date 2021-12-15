@@ -85,7 +85,10 @@
     <!-- 消息推送历史 -->
     <el-dialog title="推送历史" :close-on-click-modal="false" :visible.sync="historyDialogVisible" width="600px">
       <el-timeline>
-        <el-timeline-item v-for="(activity, index) in messageList" :key="index" :timestamp="formatDate(activity.createTime)">{{activity.remarks}}</el-timeline-item>
+        <el-timeline-item v-for="(activity, index) in messageList" :key="index" :timestamp="formatDate(activity.createTime)">
+          <div class="fz12px" style="color: #888;">{{activity.chineseName}}</div>
+          <div class="mt5px">{{activity.content}}</div>
+        </el-timeline-item>
       </el-timeline>
     </el-dialog>
     <!-- 用户评价 -->

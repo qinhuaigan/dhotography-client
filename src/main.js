@@ -18,11 +18,11 @@ globalData.applicationURL = localStorage.getItem('applicationURL')
 const axios = require('axios')
 const Message = ElementUI.Message
 
-axios.defaults.baseURL = 'http://101.200.137.140/api' // 本地环境
-Vue.prototype.baseURL = 'http://101.200.137.140/api' // 本地环境
+// axios.defaults.baseURL = 'http://localhost:3000/api' // 本地环境
+// Vue.prototype.baseURL = 'http://localhost:3000/api' // 本地环境
 
-// axios.defaults.baseURL = '/api' // 测试和正式环境
-// Vue.prototype.baseURL = '/api' // 测试
+axios.defaults.baseURL = '/api' // 测试和正式环境
+Vue.prototype.baseURL = '/api' // 测试
 
 Vue.prototype.globalData = globalData
 Vue.prototype.$axios = axios

@@ -1,5 +1,7 @@
 <template>
   <div id="carousel">
+    <el-button @click="createQRCode()">生成小程序码</el-button>
+    <img v-if="QRCode" :src="`${baseURL}${QRCode}`" >
     <el-tabs v-model="carouselType" type="card" @tab-click="getTableData()">
       <el-tab-pane :label="item.label" :name="item.value" v-for="item in tabs" :key="item.value"></el-tab-pane>
     </el-tabs>
@@ -37,6 +39,7 @@ export default {
   },
   data: function () {
     return {
+      QRCode: null,
       carouselType: '1',
       tabs: [
         {
@@ -87,6 +90,14 @@ export default {
     }
   },
   methods: {
+    async createQRCode() { // 生成小程序码
+      const scene = 'id=1&a=2'
+      const result = await this.$postData('/Themes/createQRCode', {scene: scene})
+      if (result) {
+        this.QRCode = result.data
+        console.log('QRCode ==', this.QRCode)
+      }
+    },
     handleClick (fun, index, data) {
       this[fun](index, data)
     },
