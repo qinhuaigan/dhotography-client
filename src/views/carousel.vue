@@ -1,7 +1,7 @@
 <template>
   <div id="carousel">
-    <el-button @click="createQRCode()">生成小程序码</el-button>
-    <img v-if="QRCode" :src="`${baseURL}${QRCode}`" >
+    <!-- <el-button @click="createQRCode()">生成小程序码</el-button> -->
+    <!-- <img v-if="QRCode" :src="`${baseURL}${QRCode}`" > -->
     <el-tabs v-model="carouselType" type="card" @tab-click="getTableData()">
       <el-tab-pane :label="item.label" :name="item.value" v-for="item in tabs" :key="item.value"></el-tab-pane>
     </el-tabs>
